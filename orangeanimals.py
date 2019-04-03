@@ -1,4 +1,6 @@
-﻿from sqlalchemy import create_engine, ForeignKey, Column, Integer, Date, String, Float, Boolean
+﻿#!./wkenv/Scripts/python
+
+from sqlalchemy import create_engine, ForeignKey, Column, Integer, Date, String, Float, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, with_polymorphic
 import datetime
