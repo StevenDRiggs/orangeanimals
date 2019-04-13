@@ -1,12 +1,11 @@
-﻿#!./wkenv/Scripts/python
-
-from sqlalchemy import create_engine, ForeignKey, Column, Integer, Date, String, Float, Boolean
+﻿from sqlalchemy import create_engine, ForeignKey, Column, Integer, Date, String, Float, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, with_polymorphic
 import datetime
 
 
 Base = declarative_base()
+Session = sessionmaker()
 
 
 # ==============================================================
@@ -769,6 +768,9 @@ class WithdrawalToCheque(Output):
 
 if __name__ == '__main__':
     engine = create_engine('sqlite:///oa.db', echo=True)
-    Session = sessionmaker(engine)
-    session = Session()
-    Base.metadata.create_all(engine)
+else:
+    engine = __main__.engine
+
+Session.configure(bind=engine)
+session = Session()
+Base.metadata.create_all(engine)
