@@ -30,7 +30,7 @@ if len(argv) == 1:  # test mode
     class SubTestA(Test):
         __tablename__ = 'subtest_a'
 
-        rec_id = Column(ForeignKey(Test.rec_id))
+        rec_id = Column(ForeignKey(Test.rec_id), primary_key=True)
         a_data = Column(String, default='a_data')
 
         __mapper_args__ = {
@@ -45,8 +45,8 @@ if len(argv) == 1:  # test mode
     class SubTestC(SubTestB):
         __tablename__ = 'subtest_c'
 
-        rec_id = Column(ForeignKey(Test.rec_id))
-        c_data = Column(Integer, autoincrement=True)
+        rec_id = Column(ForeignKey(Test.rec_id), primary_key=True)
+        c_data = Column(Integer, default=15)
 
         __mapper_args__ = {
                 'polymorphic_identity': 'Sub Test C (lvl 2)',
@@ -66,19 +66,50 @@ if len(argv) == 1:  # test mode
             ])
 
     session.commit()
+    session.close()
+    test_engine.dispose()
 
-    q = session.query(Test)
-    for q_ in q:
-        print(q_)
+    del session
+    del Session
+    del test_engine
 
-    q_a = session.query(SubTestA)
-    for q_a_ in q_a:
-        print(q_a_)
+    test_engine = create_engine('sqlite:///test.db', echo=True)
+    Session = sessionmaker(bind=test_engine)
+    session = Session()
 
-    q_b = session.query(SubTestB)
-    for q_b_ in q_b:
-        print(q_b_)
+    try:
+        q = session.query(Test)
+        for q_ in q:
+            assert (q_.data)
 
-    q_c = session.query(SubTestC)
-    for q_c_ in q_c:
-        print(q_c_)
+        q_a = session.query(SubTestA)
+        for q_a_ in q_a:
+            assert (q_a_.data)
+            assert (q_a_.a_data == 'a_data')
+
+        q_b = session.query(SubTestB)
+        for q_b_ in q_b:
+            assert (q_b_.data)
+
+        q_c = session.query(SubTestC)
+        for q_c_ in q_c:
+            assert (q_c_.data)
+            assert (isinstance(q_c_.c_data, int))
+
+        print('All tests passed.')
+
+    except AssertionError:
+        print('Test failed.')
+
+    quit()
+
+
+elif len(argv) == 2:
+    user = argv[1]
+    password = ''
+
+else:  # len(argv) > 2
+    user, password = argv[1:]
+
+
+print(user, password)
