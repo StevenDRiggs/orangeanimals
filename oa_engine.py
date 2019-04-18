@@ -1,17 +1,17 @@
 from sys import argv
+from os import remove
 
-from sqlalchemy import create_engine, ForeignKey, Column, Integer, Date
-from sqlalchemy import String, Float, Boolean
-from sqlalchemy.orm import sessionmaker, with_polymorphic
+from sqlalchemy import create_engine, ForeignKey, Column, Integer, String
+from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
-from datetime import datetime
+database = 'sqlite:///oa_{}.db'
 
 if len(argv) == 1:  # test mode
     with open('test.db', 'w'):
         pass
 
-    test_engine = create_engine('sqlite:///test.db', echo=True)
+    test_engine = create_engine(f'sqlite:///test.db', echo=True)
     Base = declarative_base()
     Session = sessionmaker(bind=test_engine)
     session = Session()
@@ -101,6 +101,8 @@ if len(argv) == 1:  # test mode
     except AssertionError:
         print('Test failed.')
 
+    session.close()
+    remove('test.db')
     quit()
 
 
@@ -112,4 +114,11 @@ else:  # len(argv) > 2
     user, password = argv[1:]
 
 
-print(user, password)
+engine = create_engine(database.format(user))
+Base = declarative_base(bind=engine)
+Session = sessionmaker(bind=engine)
+session = Session()
+
+import orangeanimals as oa
+
+

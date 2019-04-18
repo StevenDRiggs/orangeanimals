@@ -2,10 +2,22 @@
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, with_polymorphic
 import datetime
+import __main__
 
 
-Base = declarative_base()
-Session = sessionmaker()
+if __name__ == '__main__':
+    database = 'sqlite:///test.db'
+    engine = create_engine(database, echo=True)
+    Base = declarative_base(bind=engine)
+    Session = sessionmaker(bind=engine)
+    session = Session()
+
+else:
+    database = __main__.database
+    engine = __main__.engine
+    Base = __main__.Base
+    Session = __main__.Session
+    session = __main__.session
 
 
 # ==============================================================
@@ -766,11 +778,4 @@ class WithdrawalToCheque(Output):
 # ==============================================================
 
 
-if __name__ == '__main__':
-    engine = create_engine('sqlite:///oa.db', echo=True)
-else:
-    engine = __main__.engine
-
-Session.configure(bind=engine)
-session = Session()
 Base.metadata.create_all(engine)
