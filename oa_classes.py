@@ -1,7 +1,7 @@
 ﻿from sqlalchemy import create_engine, ForeignKey, Column, Integer, Date, String, Float, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, with_polymorphic
-import datetime
+from datetime import datetime, date
 import __main__
 
 
@@ -28,18 +28,18 @@ class Record(Base):
 
     rec_id = Column(Integer, primary_key=True)  # auto generated
     date_of_rec = Column(Date)  # date transaction occurred
-    date_entered = Column(Date, nullable=False, default=datetime.datetime.now)
-    account_name = Column(String, nullable=False)
-    account_num = Column(String)
+    date_entered = Column(Date, nullable=False, default=datetime.today())
+    account_name = Column(String(40), nullable=False)
+    account_num = Column(String(40))
     amount = Column(Float, nullable=False)
     is_regular = Column(Boolean, nullable=False, default=False)  # will this transaction regularly occur?
-    frequency = Column(String)  # if is_regular, how often?
+    frequency = Column(String(10))  # if is_regular, how often?
     regular_end_date = Column(Date)  # if is_regular, until when? (or NULL for N/A or indefinite)
-    description = Column(String)
-    target = Column(String)  # also from_account, to_account, company
-    class_ = Column('type', String)
+    description = Column(String(255))
+    target = Column(String(40))  # also from_account, to_account, company
+    class_ = Column('type', String(40))
     
-    meta = Column(String)  # used for internal processing, not (usually) seen by user
+    # meta = Column(String(255))  # used for internal processing, not (usually) seen by user
 
     __mapper_args__ = {
         'polymorphic_on': class_,
@@ -68,13 +68,14 @@ class Record(Base):
             if type_:
                 q = session.query(cls).filter(Record.class_==type_)
             else:
+                type_ = cls.__name__
                 q = session.query(cls)
             if q.count() > 0:
                 return q
             else:
                 parent = cls.__bases__[0]
                 if parent is not Base:
-                    return parent.read(cls.__name__)
+                    return parent.read(type_)
                 else:
                     raise KeyError('No records found.')
 
@@ -90,13 +91,18 @@ class Record(Base):
 
     @classmethod
     def update(cls, *, rec_num, **kwargs):
-        print('\n\n\nkwargs:', kwargs, '\n\n\n')
         try:
             q = cls.read().filter(Record.rec_id==rec_num)
             if q:
                 rec = q[0]
                 for k, v in kwargs.items():
-                    exec(f'rec.{k} = {v}')
+                    if isinstance(v, str):
+                        v_ = '"' + v + '"'
+                    elif isinstance(v, date) or isinstance(v, datetime):
+                        v_ = f'date({v.year}, {v.month}, {v.day})'
+                    else:
+                        v_ = str(v)
+                    exec(f'rec.{k} = {v_}')
                 session.commit()
             else:
                 raise KeyError('No record found.')
@@ -113,6 +119,7 @@ class Record(Base):
                 rec = q[0]
                 session.delete(rec)
                 del rec
+                session.commit()
             else:
                 raise KeyError('No record found')
 
@@ -133,9 +140,9 @@ class DepositFromCash(Input):
 class DepositFromCheque(Input):
     __tablename__ = 'DepositFromCheque'
     rec_id = Column(ForeignKey(Input.rec_id), primary_key=True)
-    bank_name = Column(String)
-    bank_routing_num = Column(String)
-    cheque_author = Column(String)  # required for DepositFromCheque
+    bank_name = Column(String(40))
+    bank_routing_num = Column(String(40))
+    cheque_author = Column(String(40))  # required for DepositFromCheque
     cheque_num = Column(Integer)  # required for WithdrawToCheque
 
     @classmethod
@@ -760,9 +767,9 @@ class WithdrawalToCash(Output):
 class WithdrawalToCheque(Output):
     __tablename__ = 'WithdrawToCheque'
     rec_id = Column(ForeignKey(Output.rec_id), primary_key=True)
-    bank_name = Column(String)
-    bank_routing_num = Column(String)
-    cheque_author = Column(String)  # required for DepositFromCheque
+    bank_name = Column(String(40))
+    bank_routing_num = Column(String(40))
+    cheque_author = Column(String(40))  # required for DepositFromCheque
     cheque_num = Column(Integer)  # required for WithdrawToCheque
 
     @classmethod
