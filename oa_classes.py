@@ -188,6 +188,9 @@ class BusinessReimbursement(SpecialtyPay):
 class Disability(SpecialtyPay):
     pass
 
+class GovernmentRelief(SpecialtyPay):
+    pass
+
 class InvestmentDividend(SpecialtyPay):
     pass
 
@@ -198,6 +201,9 @@ class TaxReturn(SpecialtyPay):
     pass
 
 class TrustFundIn(SpecialtyPay):
+    pass
+
+class Winnings(SpecialtyPay):
     pass
 # --------------------------------------------------------------
 
@@ -304,6 +310,9 @@ class Food(FourWalls):
         super().__init__(**kwargs)
         self.priority = 1
 
+class CoffeeTea(Food):
+    pass
+
 class FastFood(Food):
     pass
 
@@ -328,12 +337,24 @@ class Shelter(FourWalls):
 class HomePurchase(Shelter):
     pass
 
+class ClosingCosts(HomePurchase):
+    pass
+
+class EarnestMoney(HomePurchase):
+    pass
+
+class InitialInpsection(HomePurchase):
+    pass
+
 class Mortgage(HomePurchase):
     pass
 # --------------------------------------------------------------
 
 # --------------------------------------------------------------
 class HousingExpense(Shelter):
+    pass
+
+class AssistedLiving(HousingExpense):
     pass
 
 class HOAFee(HousingExpense):
@@ -348,6 +369,9 @@ class HousingFee(HousingExpense):
 class HousingRepair(HousingExpense):
     pass
 
+class Inspection(HousingExpense):
+    pass
+
 class LawnCare(HousingExpense):
     pass
 
@@ -355,8 +379,22 @@ class Utilities(HousingExpense):
     pass
 # --------------------------------------------------------------
 
+# --------------------------------------------------------------
 class HousingRent(Shelter):
     pass
+
+class FirstMonthRent(HousingRent):
+    pass
+
+class LastMonthRent(HousingRent):
+    pass
+
+class PetFee(HousingRent):
+    pass
+
+class SecurityDeposit(HousingRent):
+    pass
+# --------------------------------------------------------------
 
 class MiscShelter(Shelter):
     pass
@@ -485,6 +523,9 @@ class HygieneSupplies(Expenditure):
 class Spa(HealthFitness):
     pass
 
+class Supplements(HealthFitness):
+    pass
+
 class WorkoutGear(HealthFitness):
     pass
 # --------------------------------------------------------------
@@ -588,6 +629,9 @@ class NonBilledEntertainment(Expenditure):
 class Activity(NonBilledEntertainment):
     pass
 
+class Books(NonBilledEntertainment):
+    pass
+
 class Concert(NonBilledEntertainment):
     pass
 
@@ -604,6 +648,9 @@ class MiscNonBilledEntertainment(NonBilledEntertainment):
     pass
 
 class Movie(NonBilledEntertainment):
+    pass
+
+class Music(NonBilledEntertainment):
     pass
 
 class VideoGame(NonBilledEntertainment):
@@ -708,6 +755,9 @@ class Medical(Output):
     pass
 
 class Hearing(Medical):
+    pass
+
+class Hospice(Medical):
     pass
 
 class Hospital(Medical):
